@@ -23,5 +23,5 @@ Scripts to find today's MLB games, free to watch online!
 + Add free games to publicly accessible calendar (Google, iCal, etc)
 + Differentiate between network broadcasts (MLB, Facebook, etc)
 + Figure out media/stream types (audio, video, etc)
-+ Integrate rails helper methods in `ApplicationHelper` for consistency (blank?, present?, parameterize, etc)
 + Consider making classes of structs (Game, Team, etc)
++ Split MLB classes into client/parser

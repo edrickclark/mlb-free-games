@@ -1,7 +1,14 @@
 source 'https://rubygems.org'
 
-gem 'chromedriver-helper'
+# Rails
+#-------
+
 gem 'activesupport'
+
+# Other
+#------
+
+gem 'chromedriver-helper'
 gem 'awesome_print'
 gem 'nokogiri'
 gem 'plural'
