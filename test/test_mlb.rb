@@ -1,3 +1,7 @@
+# File: test/test_mlb.rb
+# =======================
+
+require "minitest/autorun"
 require 'mlb'
 
 describe 'Mlb' do

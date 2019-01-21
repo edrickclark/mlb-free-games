@@ -1,3 +1,7 @@
+# File: test/test_mlb_streams.rb
+# ===============================
+
+require "minitest/autorun"
 require 'mlb_streams'
 
 describe 'MlbStreams' do
