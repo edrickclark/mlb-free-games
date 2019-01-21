@@ -1,45 +1,45 @@
+# FILE: lib/mlb_free_games/streams.rb
+
 # Retrieve games from https://www.mlb.com/live-stream-games
 
-require_relative '../lib/mlb'
+require_relative '../mlb_free_games'
 
-class MlbStreams < Mlb
+class Streams < MlbFreeGames
 
-  attr_reader :api
+  attr_reader :api, :html
+  attr_accessor :date
 
   def initialize
     @api = Api.new(
       'mlb_streams',
       'MLB Streams',
       'https://www.mlb.com/live-stream-games',
-      'https://www.mlb.com'
+      'https://www.mlb.com',
+      '#games-results'
     )
 
     super
   end
 
-private
-
-  def fetch_api
-    api_uri = URI(@api.endpoint)
-    res = watir(api_uri, '#games-results')
-    Nokogiri::HTML(res)
-  rescue StandardError => error
-    puts "\nERROR: #{error.message}\n\n#{error.inspect}\n\n#{error.backtrace}\n"
-    nil
-  end
-
-  def parse_games(page)
-    @games = nodes_game(page).map{ |node|
+  def parse
+    @games = nodes_game(@html).map{ |node|
       game = Game.new()
       game.key = game_key(node)
-      game.time = game_time(node)
+      game.stmp = game_time(node)
       game.teams = parse_teams(nodes_team(node))
+      game.href = game_href(node)
       game.free = game_free(node)
       game.network = game_network(node)
       #game.streams = game_streams(node)
       game
     }
   end
+
+  def date_formatted
+    @date.strftime("%Y/%m/%d")
+  end
+
+private
 
   def parse_teams(nodes)
     nodes.map{ |node|
@@ -75,7 +75,8 @@ private
   end
 
   def game_href(node)
-    nil
+    game_external_id = node.attr('data-gamepk') rescue nil
+    game_external_id.nil? ? api.endpoint : "#{api.base}/gameday/#{game_external_id}/preview"
   end
 
   def game_network(node)
@@ -90,7 +91,7 @@ private
 
     node_video.css('.card-info-feeds').each{ |node_stream|
       node_info = node_stream.at_css('> a')
-      next if blank(node_info)
+      next if node_info.blank?
       streams << Stream.new(
         node_info.text.strip,
         node_info.attr('href').strip,
@@ -101,7 +102,7 @@ private
 
     node_audio.css('.card-info-feeds').each{ |node_stream|
       node_info = node_stream.at_css('> a')
-      next if blank(node_info)
+      next if node_info.blank?
       streams << Stream.new(
         node_info.text.strip,
         node_info.attr('href').strip,

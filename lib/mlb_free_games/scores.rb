@@ -1,8 +1,10 @@
+# FILE: lib/mlb_free_games/scores.rb
+
 # Retrieve games from https://www.mlb.com/scores
 
-require_relative '../lib/mlb'
+require_relative '../mlb_free_games'
 
-class MlbScores < Mlb
+class Scores < MlbFreeGames
 
   STR_MATCH = {
     network_games: {
@@ -11,34 +13,25 @@ class MlbScores < Mlb
     }
   }
 
-  attr_reader :api
+  attr_reader :api, :html
+  attr_accessor :date
 
   def initialize
     @api = Api.new(
       'mlb_scores',
       'MLB Scores',
       'https://www.mlb.com/scores',
-      'https://www.mlb.com'
+      'https://www.mlb.com',
+      '.mlb-scores__list-item--game'
     )
 
     super
   end
 
-private
-  
-  def fetch_api
-    api_uri = URI(@api.endpoint)
-    res = watir(api_uri, '.mlb-scores__list-item--game')
-    Nokogiri::HTML(res)
-  rescue StandardError => error
-    puts "\nERROR: #{error.message}\n\n#{error.inspect}\n\n#{error.backtrace}\n"
-    nil
-  end
-
-  def parse_games(page)
-    @games = nodes_game(page).map{ |node|
+  def parse
+    @games = nodes_game(@html).map{ |node|
       game = Game.new()
-      game.time = game_time(node)
+      game.stmp = game_time(node)
       game.teams = parse_teams(nodes_team(node))
       game.href = game_href(node)
       game.free = game_free(node)
@@ -55,6 +48,12 @@ private
     }
   end
 
+  def date_formatted
+    @date.strftime("%Y-%m-%d")
+  end
+
+private
+
   def parse_teams(nodes)
     nodes.map{ |node|
       team = Team.new()
@@ -66,7 +65,8 @@ private
   end
 
   def nodes_game(node)
-    node.css('.mlb-scores--responsive .mlb-scores__list-item--game') rescue []
+    #node.css('.mlb-scores--responsive .mlb-scores__list-item--game') rescue []
+    node.css('.mlb-scores--responsive .g5-component--mlb-scores__game-wrapper') rescue []
   end
 
   def nodes_team(node)
@@ -86,8 +86,10 @@ private
   end
 
   def game_href(node)
-    href = node.at_css('.p-button--scores-preview > a').attr('href') rescue ''
-    href.empty? ? '' : "#{api.base}#{href}"
+    #href = node.at_css('.p-button--scores-preview > a').attr('href') rescue ''
+    #href.empty? ? '' : "#{api.base}#{href}"
+    game_external_id = node.attr('data-gamepk') rescue nil
+    game_external_id.nil? ? api.endpoint : "#{api.base}/gameday/#{game_external_id}/preview"
   end
 
   def team_code(node)

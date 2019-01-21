@@ -49,7 +49,7 @@ module ApplicationHelper
     page = Watir::Browser.start(uri.to_s,:chrome,headless:true)
     page.element(css: wait_for_css_node).wait_until_present unless wait_for_css_node.nil?
     page.html
-  rescue MlbFreeGamesError::CustomError => error
+  rescue MlbFreeGamesError => error
     puts "\nERROR: #{error.message}\n\n#{error.inspect}\n\n#{error.backtrace}\n"
     nil
   end
