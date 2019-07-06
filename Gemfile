@@ -13,7 +13,7 @@ gem 'awesome_print'
 gem 'nokogiri'
 gem 'plural'
 gem 'watir'
-gem 'thor'
+gem 'rake'
 
 # Security Remediation
 #----------------------
