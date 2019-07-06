@@ -7,7 +7,7 @@ require 'active_support/core_ext/time/zones'
 require 'active_support/core_ext/object/blank'
 require 'active_support/core_ext/string/inflections'
 
-require './mlb_free_games/errors'
+require './lib/mlb_games/error'
 
 module ApplicationHelper
 
@@ -49,7 +49,7 @@ module ApplicationHelper
     page = Watir::Browser.start(uri.to_s,:chrome,headless:true)
     page.element(css: wait_for_css_node).wait_until_present unless wait_for_css_node.nil?
     page.html
-  rescue MlbFreeGamesError => error
+  rescue MlbGames::Error => error
     puts "\nERROR: #{error.message}\n\n#{error.inspect}\n\n#{error.backtrace}\n"
     nil
   end
