@@ -19,6 +19,7 @@ GEM
     i18n (1.0.1)
       concurrent-ruby (~> 1.0)
     io-like (0.3.0)
+    lightly (0.3.2)
     mini_portile2 (2.4.0)
     minitest (5.11.3)
     nokogiri (1.10.1)
@@ -42,6 +43,7 @@ DEPENDENCIES
   activesupport
   awesome_print
   chromedriver-helper
+  lightly
   nokogiri
   plural
   rake
@@ -49,4 +51,4 @@ DEPENDENCIES
   watir
 
 BUNDLED WITH
-   2.0.1
+   2.0.2

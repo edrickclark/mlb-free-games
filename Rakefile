@@ -1,27 +1,25 @@
 require 'awesome_print'
 
-require './lib/application_helper'
-require './lib/mlb_games/scores'
-require './lib/mlb_games/streams'
+require './lib/helpers/application_helper'
+# require './lib/mlb/clients/scores'
+# require './lib/mlb/parsers/scores'
+require './lib/mlb/clients/streams'
+require './lib/mlb/parsers/streams'
 
 namespace 'mlb' do
 
-  desc "MLB Streams"
-  task :streams do |task, args|
-    mlb = MlbGames::Streams.new
-    mlb.fetch
-    mlb.parse
-    mlb.parse_free_games
-    mlb.notify_free_games
-  end
-
   desc "MLB Scores"
-  task :scores do |task, args|
-    mlb = MlbGames::Scores.new
-    mlb.fetch
-    mlb.parse
-    mlb.parse_free_games
-    mlb.notify_free_games
+  task :streams, [:date] do |task, args|
+    args.transform_values!(&:strip)
+    date = Date.parse(args[:date]) rescue nil
+
+    client = Mlb::Client::Streams.new
+    data = client.fetch(date)
+
+    parser = Mlb::Parser::Streams.new
+    data = parser.parse(data)
+
+    ap data
   end
 
 end
